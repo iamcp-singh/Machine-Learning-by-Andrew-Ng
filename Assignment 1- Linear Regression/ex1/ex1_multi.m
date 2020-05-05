@@ -102,7 +102,10 @@ fprintf('\n');
 % Recall that the first column of X is all-ones. Thus, it does
 % not need to be normalized.
 price = 0; % You should change this
-
+predict_data = [1 1650 3];
+predict_data(2:3) = (predict_data(2:3)-mu) ./ sigma
+price = predict_data * theta
+% =============================
 
 % ============================================================
 
@@ -148,7 +151,9 @@ fprintf('\n');
 % ====================== YOUR CODE HERE ======================
 price = 0; % You should change this
 
-
+predict_data = [1 1650 3];
+predict_data(2:3) = (predict_data(2:3)-mu) ./ sigma
+price = predict_data * theta
 % ============================================================
 
 fprintf(['Predicted price of a 1650 sq-ft, 3 br house ' ...
