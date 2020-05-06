@@ -22,7 +22,7 @@ z=X * theta;
 h=sigmoid(z);
 J=-(1/m) .* ((y'*log(h))+(1-y)'*(log(1-h))) + (lambda/(2*m))*sum(theta(2:end).^2);
 temp=X' * (h-y);
-grad(1)=(temp(1)/m)
+grad(1)=(temp(1)/m);
 grad(2:end)=(1/m) * temp(2:end) + lambda/m * theta(2:end); 
 
 
