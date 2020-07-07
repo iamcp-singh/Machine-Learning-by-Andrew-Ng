@@ -11,7 +11,7 @@ function [J grad] = nnCostFunction(nn_params, ...
 %   nn_params and need to be converted back into the weight matrices. 
 % 
 %   The returned parameter grad should be a "unrolled" vector of the
-%   partial derivatives of the neural network.
+%   partial derivatives of   the neural network.
 %
 
 % Reshape nn_params back into the parameters Theta1 and Theta2, the weight matrices
@@ -38,6 +38,25 @@ Theta2_grad = zeros(size(Theta2));
 %         variable J. After implementing Part 1, you can verify that your
 %         cost function computation is correct by verifying the cost
 %         computed in ex4.m
+
+
+X = [ones(m,1), X] ;  %5000 x 401 == no_of_input_images x no_of_features . Adding 1 in X 
+a1 = X;  % 5000 x 401
+z2 = a1*Theta1' ;  % m x hidden_layer_size == 5000 x 25
+a2 = sigmoid(z2); % m x hidden_layer_size == 5000 x 25
+a2 = [ones(size(a2,1),1), a2]; % Adding 1 as first column in z = (Adding bias unit) % m x (hidden_layer_size + 1) == 5000 x 26
+z3 = a2*Theta2' ;
+a3 = sigmoid(z3); % m x num_labels == 5000 x 10
+h=a3;
+y_Vec = zeros(m,num_labels); % m x num_labels == 5000 x 10
+for i = 1:m
+y_Vec(i,y(i)) = 1; 
+##y_Vec = (1:num_labels)==y;
+end
+J = (1/m) * sum(sum((-y_Vec.*log(h))-((1-y_Vec).*log(1-h))));  %scalar
+
+
+
 %
 % Part 2: Implement the backpropagation algorithm to compute the gradients
 %         Theta1_grad and Theta2_grad. You should return the partial derivatives of
@@ -53,6 +72,14 @@ Theta2_grad = zeros(size(Theta2));
 %         Hint: We recommend implementing backpropagation using a for-loop
 %               over the training examples if you are implementing it for the 
 %               first time.
+
+Delta3 = a3 - y_Vec; % 5000 x 10
+Delta2 = (Delta3*Theta2) .* [ones(size(z2,1),1) sigmoidGradient(z2)]; % 5000 x 26
+Delta2 = Delta2(:,2:end); % 5000 x 25 %Removing delta2 for bias node
+Theta1_grad = (1/m) * (Delta2' * a1); % 25 x 401
+Theta2_grad = (1/m) * (Delta3' * a2); % 10 x 26
+
+
 %
 % Part 3: Implement regularization with the cost function and gradients.
 %
@@ -62,23 +89,17 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+reg_term = (lambda/(2*m)) * (sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2))); %scalar
+%Costfunction With regularization
+J = J + reg_term; %scalar
+  
+%Calculating gradients for the regularization
+Theta1_grad_reg_term = (lambda/m) * [zeros(size(Theta1, 1), 1) Theta1(:,2:end)]; % 25 x 401
+Theta2_grad_reg_term = (lambda/m) * [zeros(size(Theta2, 1), 1) Theta2(:,2:end)]; % 10 x 26
+  
+%Adding regularization term to earlier calculated Theta_grad
+Theta1_grad = Theta1_grad + Theta1_grad_reg_term;
+Theta2_grad = Theta2_grad + Theta2_grad_reg_term;
 
 % -------------------------------------------------------------
 
